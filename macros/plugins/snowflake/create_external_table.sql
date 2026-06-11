@@ -52,7 +52,14 @@
     {%- if columns or partitions -%}
     (
         {%- if partitions -%}{%- for partition in partitions %}
-            {{partition.name}} {{partition.data_type}} as {{partition.expression}}{{- ',' if not loop.last or columns|length > 0 -}}
+            {%- set part_expression -%}
+                {%- if partition.expression -%}
+                    {{partition.expression}}
+                {%- elif 'expression' in partition.meta -%}
+                    {{partition.meta.expression}}
+                {%- endif -%}
+            {%- endset %}
+            {{partition.name}} {{partition.data_type}} as {{part_expression}}{{- ',' if not loop.last or columns|length > 0 or infer_schema -}}    
         {%- endfor -%}{%- endif -%}
 
         {%- for column in columns %}
@@ -76,6 +83,8 @@
             {%- set col_expression -%}
                 {%- if column.expression -%}
                     {{column.expression}}
+                {%- elif 'expression' in column.meta -%}
+                    {{column.meta.expression}}
                 {%- else -%}
                     {%- if ignore_case -%}
                     {%- set col_id = 'value:c' ~ loop.index if is_csv_ff else 'GET_IGNORE_CASE($1, ' ~ "'"~ column.name ~"'"~ ')' -%}
