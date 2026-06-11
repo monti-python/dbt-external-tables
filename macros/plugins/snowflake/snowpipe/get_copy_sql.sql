@@ -4,7 +4,7 @@
     {%- set columns = source_node.columns.values() -%}
     {%- set external = source_node.external -%}
     {%- set copy_options = external.snowpipe.get('copy_options', none) -%}
-    {%- set ff_opt_dict = dbt_external_tables.get_ff(external.file_format) -%}
+    {%- set ff_name, ff_opt_dict = dbt_external_tables.get_ff(external.file_format) -%}
     {%- set is_csv = ff_opt_dict['type']|default('csv')|lower == 'csv' -%}
 
 

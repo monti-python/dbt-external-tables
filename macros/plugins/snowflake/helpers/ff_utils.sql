@@ -17,20 +17,21 @@
 
 
 {% macro get_ff(file_format) %}
-    {# 
-        Returns a dictionary of file format options.
-        If file_format is an inline definition, parses it directly.
+    {#
+        Returns a tuple of (file format name, file format options).
         If file_format is a named format reference, fetches its DDL and parses that.
     #}
     {%- set parsed = parse_ff(file_format) -%}
+    {%- set ff_name = none -%}
 
     {# If parsing returned empty dict, it is a named format. Fetch DDL and re-parse #}
     {%- if not parsed -%}
-        {% set ddl_query = "select get_ddl('FILE_FORMAT', '" ~ file_format ~ "') as ddl" %}
+        {%- set ff_name = file_format|trim -%}
+        {% set ddl_query = "select get_ddl('FILE_FORMAT', '" ~ ff_name ~ "') as ddl" %}
         {% set ddl_result = run_query(ddl_query) %}
         {% set ddl_string = ddl_result.columns[0].values()[0] %}
         {%- set parsed = parse_ff(ddl_string) -%}
     {%- endif -%}
-    
-    {{ return(parsed) }}
+
+    {{ return((ff_name, parsed)) }}
 {% endmacro %}

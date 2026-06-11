@@ -6,7 +6,7 @@
     {%- set infer_schema = external.infer_schema -%}
     {%- set ignore_case = external.ignore_case or false  -%}
 
-    {%- set ff_opt_dict = dbt_external_tables.get_ff(external.file_format) -%}
+    {%- set ff_name, ff_opt_dict = dbt_external_tables.get_ff(external.file_format) -%}
     {%- set is_csv_ff = ff_opt_dict['type']|default('csv')|lower == 'csv' -%}
 
     {%- if infer_schema -%}
@@ -22,7 +22,7 @@
                 {% do temp_ff_opt_dict.update({'parse_header': true}) %}
             {% endif %}
             {%- set file_format_query %}
-                create or replace temporary file format {{inference_ff_name}} 
+                create or replace temporary file format {{inference_ff_name}}
                     {{ temp_ff_opt_dict.items() | map('join', '=') | join(' ') }}
             {%- endset -%}
             {% do run_query(file_format_query) %}
