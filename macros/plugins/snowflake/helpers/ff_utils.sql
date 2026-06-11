@@ -22,16 +22,15 @@
         If file_format is a named format reference, fetches its DDL and parses that.
     #}
     {%- set parsed = parse_ff(file_format) -%}
-    {%- set ff_name = none -%}
-
-    {# If parsing returned empty dict, it is a named format. Fetch DDL and re-parse #}
-    {%- if not parsed -%}
-        {%- set ff_name = file_format|trim -%}
-        {% set ddl_query = "select get_ddl('FILE_FORMAT', '" ~ ff_name ~ "') as ddl" %}
-        {% set ddl_result = run_query(ddl_query) %}
-        {% set ddl_string = ddl_result.columns[0].values()[0] %}
-        {%- set parsed = parse_ff(ddl_string) -%}
+    {%- if parsed -%}
+        {{ return((none, parsed)) }}
     {%- endif -%}
 
-    {{ return((ff_name, parsed)) }}
+    {# If parsing returned an empty dict, it is a named format. Fetch DDL and re-parse. #}
+    {%- set ff_name = file_format|trim -%}
+    {% set ddl_query = "select get_ddl('FILE_FORMAT', '" ~ ff_name ~ "') as ddl" %}
+    {% set ddl_result = run_query(ddl_query) %}
+    {% set ddl_string = ddl_result.columns[0].values()[0] %}
+
+    {{ return((ff_name, parse_ff(ddl_string))) }}
 {% endmacro %}
