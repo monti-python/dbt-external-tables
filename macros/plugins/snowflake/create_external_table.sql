@@ -62,6 +62,10 @@
                     {{adapter.quote(column.alias)}}
                 {%- elif 'alias' in column -%}
                     {{column.alias}}
+                {%- elif 'alias' in column.meta and column.quote -%}
+                    {{adapter.quote(column.meta.alias)}}
+                {%- elif 'alias' in column.meta -%}
+                    {{column.meta.alias}}
                 {%- elif column_quoted == '"VALUE"' -%}
                     {# Avoid using reserved word 'VALUE' as alias #}
                     "_VALUE"

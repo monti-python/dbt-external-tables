@@ -21,12 +21,13 @@ sources:
             data_type: varchar(64)
         tests: &equal-to-the-people
           - dbt_utils.equality:
-              compare_model: ref('people')
-              compare_columns:
-                - id
-                - first_name
-                - last_name
-                - email
+              arguments:
+                compare_model: ref('people')
+                compare_columns:
+                  - id
+                  - first_name
+                  - last_name
+                  - email
 
       - name: people_csv_partitioned
         external:
@@ -89,7 +90,8 @@ sources:
         external: *csv-people
         tests: &same-rowcount
           - dbt_utils.equal_rowcount:
-              compare_model: ref('people')
+              arguments:
+                compare_model: ref('people')
         
       - name: people_csv_partitioned_no_columns
         external:
@@ -176,16 +178,19 @@ sources:
           - name: last_name
             data_type: varchar(64)
           - name: email
-            alias: email_alias
             data_type: varchar(64)
+            config:
+              meta:
+                alias: email_alias
         tests:
           - dbt_utils.equality:
-              compare_model: ref('people_alias')
-              compare_columns:
-                - id
-                - first_name
-                - last_name
-                - email_alias
+              arguments:
+                compare_model: ref('people_alias')
+                compare_columns:
+                  - id
+                  - first_name
+                  - last_name
+                  - email_alias
 
         # test for column expression
 
@@ -202,18 +207,21 @@ sources:
             data_type: varchar(64)
           - name: email_domain
             data_type: varchar(64)
-            alias: EMAIL_DOMAIN
             quote: true
-            expression: split_part(value:email::VARCHAR, '@', 2)
+            config:
+              meta:
+                alias: EMAIL_DOMAIN
+                expression: split_part(value:email::VARCHAR, '@', 2)
         tests:
           - dbt_utils.equality:
-              compare_model: ref('people_expression')
-              compare_columns:
-                - id
-                - first_name
-                - last_name
-                - email
-                - email_domain
+              arguments:
+                compare_model: ref('people_expression')
+                compare_columns:
+                  - id
+                  - first_name
+                  - last_name
+                  - email
+                  - email_domain
 
       - name: people_parquet_infer_schema_ignore_case_unpartitioned
         external: 
@@ -223,12 +231,13 @@ sources:
           ignore_case: true
         tests:
           - dbt_utils.equality:
-              compare_model: ref('people')
-              compare_columns:
-                - id
-                - first_name
-                - last_name
-                - email         
+              arguments:
+                compare_model: ref('people')
+                compare_columns:
+                  - id
+                  - first_name
+                  - last_name
+                  - email
 
       - name: people_parquet_column_list_ignore_case_partitioned
         external: 
@@ -239,12 +248,13 @@ sources:
         columns: *cols-of-the-people
         tests:
           - dbt_utils.equality:
-              compare_model: ref('people')
-              compare_columns:
-                - id
-                - first_name
-                - last_name
-                - email
+              arguments:
+                compare_model: ref('people')
+                compare_columns:
+                  - id
+                  - first_name
+                  - last_name
+                  - email
       # temporarily disabled until we can properly address Iceberg tables
       # - name: people_iceberg_no_optional_configs
       #   external: &iceberg-people
