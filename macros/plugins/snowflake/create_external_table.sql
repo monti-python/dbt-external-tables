@@ -59,7 +59,7 @@
                     {{partition.meta.expression}}
                 {%- endif -%}
             {%- endset %}
-            {{partition.name}} {{partition.data_type}} as {{part_expression}}{{- ',' if not loop.last or columns|length > 0 or infer_schema -}}    
+            {{partition.name}} {{partition.data_type}} as {{part_expression}}{{- ',' if not loop.last or columns|length > 0 or infer_schema -}}
         {%- endfor -%}{%- endif -%}
 
         {%- for column in columns %}
@@ -105,6 +105,9 @@
     {% if external.auto_refresh in (true, false) -%}
       auto_refresh = {{external.auto_refresh}}
     {%- endif %}
+    {% if external.refresh_on_create in (true, false) -%}
+      refresh_on_create = {{external.refresh_on_create}}
+    {%- endif %}
     {% if external.aws_sns_topic -%}
       aws_sns_topic = '{{external.aws_sns_topic}}'
     {%- endif %}
@@ -116,9 +119,6 @@
     file_format = {{external.file_format}}
     {% if external.table_format -%} table_format = '{{external.table_format}}' {%- endif %}
 {% endset %}
-{#  #}
 {# {{ log('ddl: ' ~ ddl, info=True) }} #}
-
 {{ ddl }};
-
 {% endmacro %}
